@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bochi — Editor de video &amp; social media</title>
+  <meta name="description" content="Portafolio de Bochi: editor de video para creadores y marcas. Reels, TikTok, YouTube y brand films que detienen el scroll." />
+
+  <!-- Fuentes: Space Grotesk (display) + Archivo (cuerpo) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Space Grotesk"', 'sans-serif'],
+            body: ['Archivo', 'sans-serif'],
+          },
+          colors: {
+            ink: {
+              950: '#050506', // fondo profundo
+              900: '#0A0A0C', // fondo elevado
+              800: '#131316', // superficie
+            },
+            fog: {
+              DEFAULT: '#EDEDEF', // texto principal
+              muted: '#9BA1AA',   // texto secundario (≥4.5:1 sobre ink-950)
+            },
+            pulse: {
+              DEFAULT: '#0b818c', // acento único (teal)
+              light: '#3EC9D6',   // tinte para texto pequeño sobre fondo oscuro (AA)
+            },
+            timeline: '#60A5FA', // detalle secundario, uso mínimo
+          },
+          maxWidth: { content: '76rem' },
+        },
+      },
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    @layer base {
+      html { color-scheme: dark; }
+      body { @apply bg-ink-950 text-fog font-body antialiased; }
+      ::selection { @apply bg-pulse/30 text-white; }
+    }
+    @layer utilities {
+      .hairline { border-color: rgba(255, 255, 255, 0.09); }
+      .focus-ring {
+        @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pulse focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950;
+      }
+      .text-giant {
+        font-size: clamp(2.75rem, 8.5vw, 7.5rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+      }
+      .text-big {
+        font-size: clamp(2rem, 5vw, 4rem);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+      }
+      .label-num { @apply font-display text-xs font-medium uppercase tracking-[0.25em] text-fog-muted; }
+    }
+
+    /* Marquee horizontal */
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .marquee-track { animation: marquee 28s linear infinite; }
+
+    /* Playhead del hero */
+    @keyframes playhead { from { left: 4%; } to { left: 96%; } }
+    .playhead { animation: playhead 8s linear infinite alternate; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .marquee-track { animation: none; }
+      .playhead { animation: none; left: 38%; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+
+<body class="min-h-dvh overflow-x-hidden">
+
+  <a href="#trabajo" class="focus-ring sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-pulse focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+  <!-- ===== NAV ===== -->
+  <header class="fixed inset-x-0 top-0 z-50 border-b hairline bg-ink-950/70 backdrop-blur-xl">
+    <nav class="mx-auto flex h-16 max-w-content items-center justify-between px-5 sm:px-8" aria-label="Principal">
+      <a href="#" class="focus-ring flex min-h-11 items-center gap-2.5 rounded-lg font-display text-lg font-semibold tracking-tight">
+        <span class="grid h-8 w-8 place-items-center rounded-lg bg-pulse/15" aria-hidden="true">
+          <!-- icono: clapperboard -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="text-pulse" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+        </span>
+        bochi<span class="text-pulse-light">.tv</span>
+      </a>
+
+      <ul class="hidden items-center gap-8 text-sm text-fog-muted md:flex">
+        <li><a href="#trabajo" class="focus-ring inline-flex min-h-11 items-center rounded-md transition-colors duration-200 hover:text-fog">Trabajo</a></li>
+        <li><a href="#servicios" class="focus-ring inline-flex min-h-11 items-center rounded-md transition-colors duration-200 hover:text-fog">Servicios</a></li>
+        <li><a href="#sobre-mi" class="focus-ring inline-flex min-h-11 items-center rounded-md transition-colors duration-200 hover:text-fog">Sobre mí</a></li>
+      </ul>
+
+      <a href="#contacto" class="focus-ring inline-flex min-h-11 items-center gap-2 rounded-full bg-fog px-5 text-sm font-semibold text-ink-950 transition-colors duration-200 hover:bg-pulse hover:text-white">
+        Trabajemos
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+      </a>
+    </nav>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="relative mx-auto max-w-content px-5 pb-20 pt-36 sm:px-8 sm:pt-44 lg:pb-28">
+    <p class="mb-8 inline-flex items-center gap-2.5 rounded-full border hairline bg-ink-900 px-4 py-2 text-sm text-fog-muted">
+      <span class="relative flex h-2 w-2" aria-hidden="true">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-pulse-light opacity-60"></span>
+        <span class="relative inline-flex h-2 w-2 rounded-full bg-pulse-light"></span>
+      </span>
+      Disponible para nuevos proyectos
+    </p>
+
+    <h1 class="text-giant font-display font-bold text-fog">
+      Edito historias<br />
+      que detienen<br />
+      <span class="text-pulse">el scroll.</span>
+    </h1>
+
+    <div class="mt-12 flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
+      <p class="max-w-md text-lg leading-relaxed text-fog-muted">
+        Soy Bochi — editor de video y contenido para social media. Convierto material crudo en reels, TikToks y piezas de YouTube que la gente sí termina de ver.
+      </p>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="#trabajo" class="focus-ring inline-flex min-h-12 items-center gap-2.5 rounded-full bg-pulse px-7 font-display font-semibold text-white transition-transform duration-200 hover:scale-[1.03]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          Ver mi trabajo
+        </a>
+        <a href="#contacto" class="focus-ring inline-flex min-h-12 items-center rounded-full border hairline px-7 font-display font-semibold text-fog transition-colors duration-200 hover:border-pulse hover:text-pulse-light">
+          Hablemos
+        </a>
+      </div>
+    </div>
+
+    <!-- Timeline decorativa con playhead -->
+    <div class="relative mt-20 h-14 overflow-hidden rounded-xl border hairline bg-ink-900" role="presentation" aria-hidden="true">
+      <div class="absolute inset-0 grid grid-cols-6 gap-1.5 p-2 sm:grid-cols-12">
+        <div class="rounded bg-pulse/25"></div><div class="rounded bg-white/5"></div><div class="rounded bg-timeline/20"></div><div class="rounded bg-white/10"></div><div class="rounded bg-pulse/15"></div><div class="rounded bg-white/5"></div>
+        <div class="hidden rounded bg-timeline/25 sm:block"></div><div class="hidden rounded bg-white/10 sm:block"></div><div class="hidden rounded bg-pulse/25 sm:block"></div><div class="hidden rounded bg-white/5 sm:block"></div><div class="hidden rounded bg-white/10 sm:block"></div><div class="hidden rounded bg-timeline/15 sm:block"></div>
+      </div>
+      <div class="playhead absolute inset-y-0 w-0.5 bg-pulse-light shadow-[0_0_16px_2px_rgba(62,201,214,0.5)]"></div>
+    </div>
+  </section>
+
+  <!-- ===== MARQUEE ===== -->
+  <div class="border-y hairline bg-ink-900 py-5" aria-hidden="true">
+    <div class="flex overflow-hidden">
+      <div class="marquee-track flex shrink-0 items-center gap-10 whitespace-nowrap pr-10 font-display text-sm font-medium uppercase tracking-[0.3em] text-fog-muted">
+        <span>Reels</span><span class="text-pulse">●</span>
+        <span>TikTok</span><span class="text-pulse">●</span>
+        <span>YouTube</span><span class="text-pulse">●</span>
+        <span>Motion graphics</span><span class="text-pulse">●</span>
+        <span>Color grading</span><span class="text-pulse">●</span>
+        <span>Brand films</span><span class="text-pulse">●</span>
+        <span>Reels</span><span class="text-pulse">●</span>
+        <span>TikTok</span><span class="text-pulse">●</span>
+        <span>YouTube</span><span class="text-pulse">●</span>
+        <span>Motion graphics</span><span class="text-pulse">●</span>
+        <span>Color grading</span><span class="text-pulse">●</span>
+        <span>Brand films</span><span class="text-pulse">●</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TRABAJO ===== -->
+  <section id="trabajo" class="mx-auto max-w-content scroll-mt-20 px-5 py-24 sm:px-8 lg:py-32">
+    <div class="mb-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="label-num mb-4">01 — Trabajo seleccionado</p>
+        <h2 class="text-big font-display font-bold">Piezas que ya<br />hicieron ruido.</h2>
+      </div>
+      <p class="max-w-xs text-sm leading-relaxed text-fog-muted">Una selección corta. Cada proyecto incluye edición, ritmo, sonido y entrega lista para publicar.</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
+      <!-- Reel destacado : The Sky Backpack (136K views) -->
+      <article class="group relative overflow-hidden rounded-2xl border hairline bg-ink-800 sm:col-span-2 lg:col-span-3">
+        <div class="grid md:grid-cols-[minmax(0,340px)_1fr]">
+          <div class="relative aspect-[9/12] overflow-hidden md:aspect-auto md:min-h-[400px]">
+            <img src="thumbnails/136k.png" alt="Thumbnail del reel The Sky Backpack" width="226" height="301" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105" />
+            <div class="absolute inset-0 bg-gradient-to-t from-ink-950/70 via-transparent to-ink-950/40"></div>
+            <span class="absolute left-4 top-4 rounded-full bg-ink-950/70 px-3 py-1 text-xs font-medium uppercase tracking-wider text-fog backdrop-blur">Reel · Más visto</span>
+            <span class="absolute inset-0 grid place-items-center">
+              <span class="grid h-14 w-14 place-items-center rounded-full bg-white/10 backdrop-blur transition-all duration-300 group-hover:bg-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="ml-0.5 text-white" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              </span>
+            </span>
+          </div>
+          <div class="flex flex-col justify-center gap-5 p-6 sm:p-10">
+            <h3 class="font-display text-2xl font-semibold leading-snug sm:text-3xl">The Sky Backpack makes your brand impossible to ignore.</h3>
+            <p class="text-sm text-fog-muted">Reel de producto · Instagram</p>
+            <div class="flex gap-10">
+              <div>
+                <p class="font-display text-3xl font-bold text-pulse-light">136K</p>
+                <p class="text-xs text-fog-muted">views</p>
+              </div>
+              <div>
+                <p class="font-display text-3xl font-bold text-fog">988</p>
+                <p class="text-xs text-fog-muted">comentarios</p>
+              </div>
+            </div>
+            <p class="inline-flex items-center gap-2 font-display text-sm font-semibold text-pulse-light">
+              Ver en Instagram
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+            </p>
+          </div>
+        </div>
+        <a href="https://www.instagram.com/reel/DZDfQptJToR/?utm_source=ig_web_button_share_sheet&amp;igsh=MzRlODBiNWFlZA==" target="_blank" rel="noopener" class="focus-ring absolute inset-0 rounded-2xl" aria-label="Ver reel The Sky Backpack en Instagram (se abre en pestaña nueva)"><span class="sr-only">Ver reel en Instagram</span></a>
+      </article>
+
+      <!-- Proyecto 2 : vertical -->
+      <article class="group relative overflow-hidden rounded-2xl border hairline bg-ink-800">
+        <div class="relative aspect-[9/12] overflow-hidden sm:aspect-[9/14]">
+          <img src="thumbnails/1.9k.png" alt="Thumbnail del Reel 01" width="198" height="304" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-t from-ink-950/70 via-transparent to-ink-950/40"></div>
+          <span class="absolute left-4 top-4 rounded-full bg-ink-950/70 px-3 py-1 text-xs font-medium uppercase tracking-wider text-fog backdrop-blur">Reel · 9:16</span>
+          <span class="absolute inset-0 grid place-items-center">
+            <span class="grid h-14 w-14 place-items-center rounded-full bg-white/10 backdrop-blur transition-all duration-300 group-hover:bg-pulse">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="ml-0.5 text-white" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </span>
+          </span>
+        </div>
+        <div class="flex items-start justify-between gap-4 p-5">
+          <div>
+            <h3 class="font-display text-lg font-semibold">Reel 01</h3>
+            <p class="mt-1 text-sm text-fog-muted">Instagram · ver reel</p>
+          </div>
+          <p class="shrink-0 text-right font-display text-sm font-semibold text-pulse-light">1.9K<span class="block text-xs font-normal text-fog-muted">views</span></p>
+        </div>
+        <a href="https://www.instagram.com/reel/DUmNyBDgcmp/?utm_source=ig_web_copy_link&amp;igsh=MzRlODBiNWFlZA==" target="_blank" rel="noopener" class="focus-ring absolute inset-0 rounded-2xl" aria-label="Ver Reel 01 en Instagram (se abre en pestaña nueva)"><span class="sr-only">Ver reel en Instagram</span></a>
+      </article>
+
+      <!-- Proyecto 3 : vertical -->
+      <article class="group relative overflow-hidden rounded-2xl border hairline bg-ink-800">
+        <div class="relative aspect-[9/12] overflow-hidden sm:aspect-[9/14]">
+          <img src="thumbnails/1.8k.png" alt="Thumbnail del Reel 02" width="212" height="306" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-t from-ink-950/70 via-transparent to-ink-950/40"></div>
+          <span class="absolute left-4 top-4 rounded-full bg-ink-950/70 px-3 py-1 text-xs font-medium uppercase tracking-wider text-fog backdrop-blur">Reel · 9:16</span>
+          <span class="absolute inset-0 grid place-items-center">
+            <span class="grid h-14 w-14 place-items-center rounded-full bg-white/10 backdrop-blur transition-all duration-300 group-hover:bg-pulse">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="ml-0.5 text-white" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </span>
+          </span>
+        </div>
+        <div class="flex items-start justify-between gap-4 p-5">
+          <div>
+            <h3 class="font-display text-lg font-semibold">Reel 02</h3>
+            <p class="mt-1 text-sm text-fog-muted">Instagram · ver reel</p>
+          </div>
+          <p class="shrink-0 text-right font-display text-sm font-semibold text-pulse-light">1.8K<span class="block text-xs font-normal text-fog-muted">views</span></p>
+        </div>
+        <a href="https://www.instagram.com/reel/DUt7u-BES25/?utm_source=ig_web_copy_link&amp;igsh=MzRlODBiNWFlZA==" target="_blank" rel="noopener" class="focus-ring absolute inset-0 rounded-2xl" aria-label="Ver Reel 02 en Instagram (se abre en pestaña nueva)"><span class="sr-only">Ver reel en Instagram</span></a>
+      </article>
+
+      <!-- Reel 03 : vertical -->
+      <article class="group relative overflow-hidden rounded-2xl border hairline bg-ink-800">
+        <div class="relative aspect-[9/12] overflow-hidden sm:aspect-[9/14]">
+          <img src="thumbnails/200.png" alt="Thumbnail del Reel 03" width="200" height="294" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-t from-ink-950/70 via-transparent to-ink-950/40"></div>
+          <span class="absolute left-4 top-4 rounded-full bg-ink-950/70 px-3 py-1 text-xs font-medium uppercase tracking-wider text-fog backdrop-blur">Reel · 9:16</span>
+          <span class="absolute inset-0 grid place-items-center">
+            <span class="grid h-14 w-14 place-items-center rounded-full bg-white/10 backdrop-blur transition-all duration-300 group-hover:bg-pulse">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="ml-0.5 text-white" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </span>
+          </span>
+        </div>
+        <div class="flex items-start justify-between gap-4 p-5">
+          <div>
+            <h3 class="font-display text-lg font-semibold">Reel 03</h3>
+            <p class="mt-1 text-sm text-fog-muted">Instagram · ver reel</p>
+          </div>
+          <p class="shrink-0 text-right font-display text-sm font-semibold text-pulse-light">200<span class="block text-xs font-normal text-fog-muted">views</span></p>
+        </div>
+        <a href="https://www.instagram.com/reel/DXiKSpJAuji/?utm_source=ig_web_copy_link&amp;igsh=MzRlODBiNWFlZA==" target="_blank" rel="noopener" class="focus-ring absolute inset-0 rounded-2xl" aria-label="Ver Reel 03 en Instagram (se abre en pestaña nueva)"><span class="sr-only">Ver reel en Instagram</span></a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== STATS ===== -->
+  <section class="border-y hairline bg-ink-900">
+    <dl class="mx-auto grid max-w-content grid-cols-2 gap-px px-5 py-14 sm:px-8 lg:grid-cols-4">
+      <div class="py-4">
+        <dt class="order-2 text-sm text-fog-muted">Views acumuladas</dt>
+        <dd class="font-display text-4xl font-bold text-fog sm:text-5xl">+120M</dd>
+      </div>
+      <div class="py-4">
+        <dt class="order-2 text-sm text-fog-muted">Videos entregados</dt>
+        <dd class="font-display text-4xl font-bold text-fog sm:text-5xl">640</dd>
+      </div>
+      <div class="py-4">
+        <dt class="order-2 text-sm text-fog-muted">Clientes y creadores</dt>
+        <dd class="font-display text-4xl font-bold text-fog sm:text-5xl">38</dd>
+      </div>
+      <div class="py-4">
+        <dt class="order-2 text-sm text-fog-muted">Años editando</dt>
+        <dd class="font-display text-4xl font-bold text-pulse-light sm:text-5xl">6</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ===== SERVICIOS ===== -->
+  <section id="servicios" class="mx-auto max-w-content scroll-mt-20 px-5 py-24 sm:px-8 lg:py-32">
+    <p class="label-num mb-4">02 — Servicios</p>
+    <h2 class="text-big mb-14 max-w-2xl font-display font-bold">Todo lo que tu contenido necesita para publicarse.</h2>
+
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div class="group rounded-2xl border hairline bg-ink-900 p-7 transition-colors duration-200 hover:border-pulse/40">
+        <span class="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-pulse/15" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3EC9D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="20" x="6" y="2" rx="2"/><path d="M12 18h.01"/></svg>
+        </span>
+        <h3 class="font-display text-xl font-semibold">Edición vertical</h3>
+        <p class="mt-2 text-sm leading-relaxed text-fog-muted">Reels, TikTok y Shorts con hooks en los primeros 2 segundos, subtítulos dinámicos y ritmo pensado para retención.</p>
+      </div>
+
+      <div class="group rounded-2xl border hairline bg-ink-900 p-7 transition-colors duration-200 hover:border-pulse/40">
+        <span class="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-pulse/15" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3EC9D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 7 5 3-5 3Z"/><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M12 17v4"/><path d="M8 21h8"/></svg>
+        </span>
+        <h3 class="font-display text-xl font-semibold">YouTube long-form</h3>
+        <p class="mt-2 text-sm leading-relaxed text-fog-muted">Documentales, vlogs y video-ensayos. Estructura narrativa, b-roll, sound design y gráficos que sostienen 20+ minutos.</p>
+      </div>
+
+      <div class="group rounded-2xl border hairline bg-ink-900 p-7 transition-colors duration-200 hover:border-pulse/40">
+        <span class="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-pulse/15" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3EC9D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg>
+        </span>
+        <h3 class="font-display text-xl font-semibold">Motion graphics</h3>
+        <p class="mt-2 text-sm leading-relaxed text-fog-muted">Intros, lower thirds, transiciones y animación de texto en After Effects, alineados a la identidad de tu marca.</p>
+      </div>
+
+      <div class="group rounded-2xl border hairline bg-ink-900 p-7 transition-colors duration-200 hover:border-pulse/40">
+        <span class="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-pulse/15" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3EC9D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="#3EC9D6"/><circle cx="17.5" cy="10.5" r=".5" fill="#3EC9D6"/><circle cx="8.5" cy="7.5" r=".5" fill="#3EC9D6"/><circle cx="6.5" cy="12.5" r=".5" fill="#3EC9D6"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        </span>
+        <h3 class="font-display text-xl font-semibold">Color grading</h3>
+        <p class="mt-2 text-sm leading-relaxed text-fog-muted">Corrección y look cinematográfico en DaVinci Resolve. Consistencia de color entre cámaras, tomas y episodios.</p>
+      </div>
+
+      <div class="group rounded-2xl border hairline bg-ink-900 p-7 transition-colors duration-200 hover:border-pulse/40">
+        <span class="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-pulse/15" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3EC9D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+        </span>
+        <h3 class="font-display text-xl font-semibold">Sound design</h3>
+        <p class="mt-2 text-sm leading-relaxed text-fog-muted">Mezcla, limpieza de audio, SFX y música con licencia. El 50% de un buen video es lo que se escucha.</p>
+      </div>
+
+      <div class="group rounded-2xl border hairline bg-ink-900 p-7 transition-colors duration-200 hover:border-pulse/40">
+        <span class="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-pulse/15" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3EC9D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        </span>
+        <h3 class="font-display text-xl font-semibold">Estrategia de contenido</h3>
+        <p class="mt-2 text-sm leading-relaxed text-fog-muted">Calendarios, formatos y análisis de métricas para que cada pieza publique con intención, no por inercia.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SOBRE MÍ ===== -->
+  <section id="sobre-mi" class="border-y hairline bg-ink-900">
+    <div class="mx-auto grid max-w-content scroll-mt-20 gap-12 px-5 py-24 sm:px-8 lg:grid-cols-2 lg:gap-20 lg:py-32">
+      <div>
+        <p class="label-num mb-4">03 — Sobre mí</p>
+        <h2 class="text-big font-display font-bold">Detrás de<br />cada corte.</h2>
+        <p class="mt-8 max-w-md leading-relaxed text-fog-muted">
+          Llevo 6 años editando para creadores, marcas y agencias. Empecé cortando vlogs en una laptop prestada; hoy edito series completas que suman millones de vistas. Mi regla: si un frame no aporta, se va.
+        </p>
+        <p class="mt-4 max-w-md leading-relaxed text-fog-muted">
+          Trabajo remoto, entrego en plazos de 48–72 horas para formatos cortos y me integro a tu flujo: Frame.io, Notion, Drive o lo que uses.
+        </p>
+      </div>
+
+      <div class="flex flex-col justify-end gap-8">
+        <div>
+          <h3 class="label-num mb-5">Herramientas</h3>
+          <ul class="flex flex-wrap gap-3">
+            <li class="rounded-full border hairline px-4 py-2 text-sm text-fog">Premiere Pro</li>
+            <li class="rounded-full border hairline px-4 py-2 text-sm text-fog">After Effects</li>
+            <li class="rounded-full border hairline px-4 py-2 text-sm text-fog">DaVinci Resolve</li>
+            <li class="rounded-full border hairline px-4 py-2 text-sm text-fog">CapCut Pro</li>
+            <li class="rounded-full border hairline px-4 py-2 text-sm text-fog">Frame.io</li>
+          </ul>
+        </div>
+        <figure class="rounded-2xl border hairline bg-ink-800 p-7">
+          <blockquote class="text-lg leading-relaxed text-fog">
+            "Bochi entiende el algoritmo mejor que nosotros. Triplicó la retención promedio de nuestros reels en dos meses."
+          </blockquote>
+          <figcaption class="mt-4 flex items-center gap-3 text-sm text-fog-muted">
+            <span class="grid h-9 w-9 place-items-center rounded-full bg-pulse/15 font-display text-xs font-bold text-pulse-light" aria-hidden="true">MR</span>
+            María R. — Head of Content, marca DTC
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACTO / CTA ===== -->
+  <section id="contacto" class="mx-auto max-w-content scroll-mt-20 px-5 py-28 text-center sm:px-8 lg:py-40">
+    <p class="label-num mb-6">04 — Contacto</p>
+    <h2 class="text-giant font-display font-bold">
+      ¿Hacemos algo<br /><span class="text-pulse">que se comparta?</span>
+    </h2>
+    <p class="mx-auto mt-8 max-w-md text-lg text-fog-muted">Cuéntame tu proyecto y te respondo en menos de 24 horas con propuesta y tiempos.</p>
+    <div class="mt-12 flex flex-wrap items-center justify-center gap-4">
+      <a href="mailto:hola@bochi.tv" class="focus-ring inline-flex min-h-14 items-center gap-3 rounded-full bg-pulse px-9 font-display text-lg font-semibold text-white transition-transform duration-200 hover:scale-[1.03]">
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        hola@bochi.tv
+      </a>
+      <a href="https://wa.me/5215500000000" class="focus-ring inline-flex min-h-14 items-center rounded-full border hairline px-9 font-display text-lg font-semibold text-fog transition-colors duration-200 hover:border-pulse hover:text-pulse-light">
+        WhatsApp
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="border-t hairline">
+    <div class="mx-auto flex max-w-content flex-col items-center justify-between gap-6 px-5 py-10 text-sm text-fog-muted sm:flex-row sm:px-8">
+      <p>© 2026 Bochi — Editor de video &amp; social media</p>
+      <ul class="flex flex-wrap items-center gap-2">
+        <li>
+          <a href="https://www.instagram.com/howtosay_no/" target="_blank" rel="noopener" class="focus-ring inline-flex min-h-11 items-center gap-2 rounded-full border hairline px-4 transition-colors duration-200 hover:border-pulse hover:text-pulse-light" aria-label="Instagram @howtosay_no (se abre en pestaña nueva)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            @howtosay_no
+          </a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/imprintgoods/" target="_blank" rel="noopener" class="focus-ring inline-flex min-h-11 items-center gap-2 rounded-full border hairline px-4 transition-colors duration-200 hover:border-pulse hover:text-pulse-light" aria-label="Instagram @imprintgoods (se abre en pestaña nueva)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            @imprintgoods
+          </a>
+        </li>
+      </ul>
+    </div>
+  </footer>
+
+</body>
+</html>
